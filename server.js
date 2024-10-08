@@ -32,6 +32,11 @@ io.on("connection", (socket) => {
     // Checking if the number of players are two
     if (readyPlayerCount === 2) {
       // We need to broadcast to players that the game starts, then starts the game
+      // We have to broadcast messages to all connected players(Cfr Socket.io cheatsheet)
+
+      // io.emit('start the game'); // then let's add the referee who is the second player
+
+      io.emit("start the game", socket.id);
     }
   });
 });
