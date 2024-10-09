@@ -36,7 +36,15 @@ io.on("connection", (socket) => {
 
       // io.emit('start the game'); // then let's add the referee who is the second player
 
-      io.emit("startGame", socket.id);
+      io.emit("startGame", socket.id); // by passing the socket.id here it is effectively choosing the second player as the referee
     }
+  });
+
+  //Adding a listener with our socket.on function listening for our paddleMove event
+  socket.on("paddleMove", (paddleData) => {
+    // We need to keep both players in sync, to mean when we receive these updates, we will need to broadcast data back to the other clients.
+    // Notice here the sender does not need to receive the information he/she already has.
+    // we have to change the broadcaster
+    socket.broadcast.emit("paddleMove", paddleData);
   });
 });

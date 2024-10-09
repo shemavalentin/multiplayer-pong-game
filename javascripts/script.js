@@ -191,6 +191,15 @@ function startGame() {
     if (paddleX[paddleIndex] > width - paddleWidth) {
       paddleX[paddleIndex] = width - paddleWidth;
     }
+
+    // Emitting the position of the paddle to the server to have the same paddle position
+    // on both player screen(the opponent screen)
+    socket.emit("paddleMove", {
+      xPosition: paddleX[paddleIndex],
+
+      // Now the two paddles are in sync
+    });
+
     // Hide Cursor
     canvas.style.cursor = "none";
   });
@@ -215,4 +224,17 @@ socket.on("startGame", (refereeId) => {
   // Then here call the start game function to start the game when we've received the signal from the server
 
   startGame();
+});
+
+// On the client side here we need to handle updates on our opponet's paddle position.
+// It means we need to listen for, using socket.on paddleMove event. and this is where
+// need to update the game state in this client to teflect the game state on our opponent's client
+// specifically updating our paddleX.
+
+socket.on("paddleMove", (paddleData) => {
+  // Let's set the Xposition.
+  // Here we are always Togggle 1 into 0, and 0 into 1
+
+  const opponentPaddleIndex = 1 - paddleIndex;
+  paddleX[opponentPaddleIndex] = paddleData.xPosition;
 });
