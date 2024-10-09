@@ -30,7 +30,13 @@ io.on("connection", (socket) => {
     readyPlayerCount++;
 
     // Checking if the number of players are two
-    if (readyPlayerCount === 2) {
+
+    // if (readyPlayerCount === 2) {
+
+    // The reason why the game does not restart automatically after a disconnet is
+    // because we have hardcoded the number of players. solve this we can use advaned
+    // feature of sockets called Rooms or check that the number of players will always be an even number
+    if (readyPlayerCount % 2 === 0) {
       // We need to broadcast to players that the game starts, then starts the game
       // We have to broadcast messages to all connected players(Cfr Socket.io cheatsheet)
 
@@ -54,5 +60,10 @@ io.on("connection", (socket) => {
     // then rebroadcast not to all of the client/players but to all of the
     //clients excepts for the the sender of the paddle move ivent or the ball move event in this case.
     socket.broadcast.emit("ballMove", ballData);
+  });
+
+  // Once we need to detect a disconnect we can do this
+  socket.on("disconnect", (reason) => {
+    console.log(`Client ${socket.id} disconnected: ${reason}`);
   });
 });
