@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/shemavalentin/multiplayer-pong-game#readme",
   "dependencies": {
+    "express": "^4.21.1",
     "socket.io": "^4.8.0"
   }
 }
