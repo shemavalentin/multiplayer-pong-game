@@ -94,6 +94,13 @@ function ballReset() {
   ballX = width / 2;
   ballY = height / 2;
   speedY = 3;
+
+  // Emitting the ball posititon to the server
+  socket.emit("ballMove", {
+    ballX,
+    ballY,
+    score,
+  });
 }
 
 // Adjust Ball Movement
@@ -104,6 +111,12 @@ function ballMove() {
   if (playerMoved) {
     ballX += speedX;
   }
+  // Emitting the ball positions to the server
+  socket.emit("ballMove", {
+    ballX,
+    ballY,
+    score,
+  });
 }
 
 // Determine What Ball Bounces Off, Score Points, Reset Ball
@@ -158,12 +171,17 @@ function ballBoundaries() {
   }
 }
 
-// Called Every Frame
+// Called Every Frame (The game loop)
 function animate() {
-  // computerAI();
-  ballMove();
+  //making sure that the ball move and the ball reset to the center
+  // calculations are only done to the referee. other players do not need to do all these calculations
+  if (isReferee) {
+    // computerAI();
+    ballMove();
+    ballBoundaries();
+    //Now the non referee client is not tracking anything that is being tracked in these two functions
+  }
   renderCanvas();
-  ballBoundaries();
   window.requestAnimationFrame(animate);
 }
 
@@ -238,3 +256,11 @@ socket.on("paddleMove", (paddleData) => {
   const opponentPaddleIndex = 1 - paddleIndex;
   paddleX[opponentPaddleIndex] = paddleData.xPosition;
 });
+
+// We need to listen all data of players that are broadcasted from the server about the ball data and paddle data
+socket.on("ballMove", (ballData) => {
+  // Using object destructuring syntax here
+  ({ ballX, ballY, score } = ballData);
+});
+
+// Like this our Paddle and the ball data are being synchlonized between the two players

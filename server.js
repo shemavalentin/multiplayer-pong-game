@@ -47,4 +47,12 @@ io.on("connection", (socket) => {
     // we have to change the broadcaster
     socket.broadcast.emit("paddleMove", paddleData);
   });
+
+  // Listening to the ball move event,after separating the referee logic and other players
+  // logic as non referee players do not need to keep track on the ball positions and move
+  socket.on("ballMove", (ballData) => {
+    // then rebroadcast not to all of the client/players but to all of the
+    //clients excepts for the the sender of the paddle move ivent or the ball move event in this case.
+    socket.broadcast.emit("ballMove", ballData);
+  });
 });
