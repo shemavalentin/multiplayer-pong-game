@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
 
       // io.emit('start the game'); // then let's add the referee who is the second player
 
-      io.emit("start the game", socket.id);
+      io.emit("startGame", socket.id);
     }
   });
 });

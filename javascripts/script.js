@@ -2,6 +2,10 @@
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
 const socket = io("http://localhost:3000");
+
+// keeping track of the referee
+isReferee = false; // if a certain condition is met --->
+
 let paddleIndex = 0;
 
 let width = 500;
@@ -163,15 +167,20 @@ function animate() {
   window.requestAnimationFrame(animate);
 }
 
-// Start Game, Reset Everything
-function startGame() {
+// Load Game, Reset Everything
+function loadGame() {
   createCanvas();
   renderIntro();
-
   socket.emit("ready"); // to emit that the player is ready to start the game
   // but the socket.io has generated the uuid for us to identify each client uniquely.
+}
 
-  paddleIndex = 0;
+// Start Game
+
+function startGame() {
+  // paddleIndex = 0;  this can work when there is one player. but when they are two we need
+  // to decide who controls the bottom paddle, or the top.
+  paddleIndex = isReferee ? 0 : 1;
   window.requestAnimationFrame(animate);
   canvas.addEventListener("mousemove", (e) => {
     playerMoved = true;
@@ -188,9 +197,22 @@ function startGame() {
 }
 
 // On Load
-startGame();
+loadGame();
 
 // Generating the socket id to the front end when connected
 socket.on("connect", () => {
-  console.log("connected as ...", socket.id);
+  console.log("connected as...", socket.id);
+});
+
+// Adding a handler to start the game
+socket.on("startGame", (refereeId) => {
+  console.log("Referee is", refereeId); // Here we need to keep track of the refereeId
+  // to know exactly if it the referee in order to know we are the one to keep track of the score, or the ball position
+
+  // And now we can know who the referee is
+  isReferee = socket.id === refereeId;
+
+  // Then here call the start game function to start the game when we've received the signal from the server
+
+  startGame();
 });
